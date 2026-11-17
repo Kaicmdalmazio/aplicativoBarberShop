@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'view/login_screen.dart';
+import 'view/home_screen.dart';
 
 void main() {
   runApp(const BarbeariaApp());

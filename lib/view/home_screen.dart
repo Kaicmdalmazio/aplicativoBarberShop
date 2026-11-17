@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'perfil_screen.dart';
+import 'localizacao_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -34,8 +35,9 @@ class HomeScreen extends StatelessWidget {
   Widget _acessoRapido(
       BuildContext context,
       IconData icone,
-      String titulo,
-      ) {
+      String titulo, {
+        VoidCallback? aoClicar,
+      }){
     return Expanded(
       child: InkWell(
         onTap: () => _avisar(context, titulo),
@@ -297,12 +299,21 @@ class HomeScreen extends StatelessWidget {
                     Icons.calendar_today,
                     'Reservas',
                   ),
-                  const SizedBox(width: 10),
+
                   _acessoRapido(
                     context,
                     Icons.location_on_outlined,
                     'Localização',
+                    aoClicar: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LocalizacaoScreen(),
+                        ),
+                      );
+                    },
                   ),
+
                 ],
               ),
 

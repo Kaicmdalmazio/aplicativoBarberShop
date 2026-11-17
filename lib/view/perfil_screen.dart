@@ -1,21 +1,59 @@
 
 import 'package:flutter/material.dart';
+import 'editar_perfil_screen.dart';
 
-class PerfilScreen extends StatelessWidget {
+class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
+
+  @override
+  State<PerfilScreen> createState() => _PerfilScreenState();
+}
+
+class _PerfilScreenState extends State<PerfilScreen> {
 
   static const Color _dourado = Color(0xFFD9AB62);
   static const Color _fundo = Color(0xFF171717);
   static const Color _cartao = Color(0xFF292929);
 
-  // Mensagem para funcionalidades futuras.
+  // Dados temporários do cliente.
+  String _nome = 'João Silva';
+  String _email = 'joao@email.com';
+  String _telefone = '(27) 99999-9999';
+
+  // Abre a edição e aguarda os dados atualizados.
+  Future<void> _abrirEdicao() async {
+
+    final resultado =
+    await Navigator.push<Map<String, String>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditarPerfilScreen(
+          nome: _nome,
+          email: _email,
+          telefone: _telefone,
+        ),
+      ),
+    );
+
+    // Verifica se a tela continua ativa e se houve salvamento.
+    if (!mounted || resultado == null) {
+      return;
+    }
+
+    // Atualiza os dados exibidos no Perfil.
+    setState(() {
+      _nome = resultado['nome'] ?? _nome;
+      _email = resultado['email'] ?? _email;
+      _telefone = resultado['telefone'] ?? _telefone;
+    });
+  }
+
   void _avisar(BuildContext context, String mensagem) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(mensagem)),
     );
   }
 
-  // Cria um campo visual de informação pessoal.
   Widget _informacao(
       IconData icone,
       String titulo,
@@ -49,7 +87,6 @@ class PerfilScreen extends StatelessWidget {
     );
   }
 
-  // Cria uma opção clicável da conta.
   Widget _opcao(
       IconData icone,
       String titulo,
@@ -66,15 +103,14 @@ class PerfilScreen extends StatelessWidget {
     );
   }
 
-  // Solicita confirmação antes de sair.
-  Future<void> _confirmarSaida(BuildContext context) async {
+  Future<void> _confirmarSaida() async {
     final confirmou = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Sair da conta'),
           content: const Text(
-            'Deseja realmente voltar para a tela de Login?',
+            'Deseja realmente voltar para o Login?',
           ),
           actions: [
             TextButton(
@@ -83,7 +119,6 @@ class PerfilScreen extends StatelessWidget {
               },
               child: const Text('Cancelar'),
             ),
-
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
@@ -95,7 +130,7 @@ class PerfilScreen extends StatelessWidget {
       },
     );
 
-    if (confirmou == true && context.mounted) {
+    if (confirmou == true && mounted) {
       Navigator.of(context).popUntil(
             (route) => route.isFirst,
       );
@@ -120,7 +155,6 @@ class PerfilScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
 
-              // FOTO E NOME DO CLIENTE
               const CircleAvatar(
                 radius: 45,
                 backgroundColor: Color(0xFF362C20),
@@ -133,10 +167,11 @@ class PerfilScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              const Text(
-                'João Silva',
+              // Nome agora é dinâmico.
+              Text(
+                _nome,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -152,11 +187,11 @@ class PerfilScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // INFORMAÇÕES PESSOAIS
               Card(
                 color: _cartao,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
+
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -174,7 +209,7 @@ class PerfilScreen extends StatelessWidget {
                       _informacao(
                         Icons.person_outline,
                         'Nome',
-                        'João Silva',
+                        _nome,
                       ),
 
                       const Divider(),
@@ -182,7 +217,7 @@ class PerfilScreen extends StatelessWidget {
                       _informacao(
                         Icons.email_outlined,
                         'E-mail',
-                        'joao@email.com',
+                        _email,
                       ),
 
                       const Divider(),
@@ -190,7 +225,7 @@ class PerfilScreen extends StatelessWidget {
                       _informacao(
                         Icons.phone_outlined,
                         'Telefone',
-                        '(27) 99999-9999',
+                        _telefone,
                       ),
 
                     ],
@@ -202,14 +237,10 @@ class PerfilScreen extends StatelessWidget {
 
               // EDITAR PERFIL
               ElevatedButton.icon(
-                onPressed: () {
-                  _avisar(
-                    context,
-                    'Tela Editar Perfil será implementada.',
-                  );
-                },
+                onPressed: _abrirEdicao,
                 icon: const Icon(Icons.edit_outlined),
                 label: const Text('EDITAR PERFIL'),
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _dourado,
                   foregroundColor: _fundo,
@@ -255,11 +286,11 @@ class PerfilScreen extends StatelessWidget {
 
               const SizedBox(height: 25),
 
-              // SAIR DA CONTA
               OutlinedButton.icon(
-                onPressed: () => _confirmarSaida(context),
+                onPressed: _confirmarSaida,
                 icon: const Icon(Icons.logout),
                 label: const Text('SAIR DA CONTA'),
+
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.redAccent,
                   side: const BorderSide(
@@ -270,13 +301,11 @@ class PerfilScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
             ],
           ),
         ),
       ),
 
-      // MENU INFERIOR
       bottomNavigationBar: NavigationBar(
         selectedIndex: 3,
         backgroundColor: const Color(0xFF222222),
